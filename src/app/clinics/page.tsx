@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import dynamic from 'next/dynamic';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Hospital, MapPin, Stethoscope, LocateFixed, Loader2, AlertTriangle, Route } from "lucide-react";
@@ -10,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { findNearbyClinics } from "@/lib/actions";
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
 // Fix for default icon issue with Leaflet and React
@@ -45,11 +45,11 @@ export default function ClinicsPage() {
   const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number } | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([20.5937, 78.9629]); // Default to India
   const [mapZoom, setMapZoom] = useState(4);
-  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const Map = useMemo(() => dynamic(() => import('@/components/map'), { 
+    loading: () => <p className="text-muted-foreground">Loading Map...</p>,
+    ssr: false 
+  }), []);
 
   const handleFindNearby = () => {
     setLocating(true);
@@ -193,29 +193,14 @@ export default function ClinicsPage() {
         </div>
         <div className="lg:col-span-2">
            <div className="w-full h-[600px] rounded-lg bg-muted flex items-center justify-center overflow-hidden shadow-2xl">
-              {isClient ? (
-                <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  {userLocation && (
-                    <Marker position={[userLocation.latitude, userLocation.longitude]} icon={userIcon}>
-                      <Popup>You are here</Popup>
-                    </Marker>
-                  )}
-                  {clinics.map(clinic => (
-                    <Marker key={clinic.id} position={[clinic.lat, clinic.lon]} icon={clinicIcon}>
-                      <Popup>
-                        <b>{clinic.name}</b><br />
-                        {clinic.address}
-                      </Popup>
-                    </Marker>
-                  ))}
-                </MapContainer>
-              ) : (
-                <p className="text-muted-foreground">Loading Map...</p>
-              )}
+              <Map
+                  mapCenter={mapCenter}
+                  mapZoom={mapZoom}
+                  userLocation={userLocation}
+                  clinics={clinics}
+                  userIcon={userIcon}
+                  clinicIcon={clinicIcon}
+                />
            </div>
         </div>
       </div>
