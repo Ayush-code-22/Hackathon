@@ -66,3 +66,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Leaflet Marker Styling */
+.leaflet-map-container .user-location-marker {
+  filter: hue-rotate(120deg);
+}

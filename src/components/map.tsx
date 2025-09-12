@@ -15,7 +15,7 @@ const userIcon = new L.Icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
-  className: 'user-location-marker'
+  className: 'user-location-marker' // Use a class name for custom styling
 });
 
 const clinicIcon = new L.Icon({
@@ -46,32 +46,25 @@ function ChangeView({ center, zoom }: { center: [number, number], zoom: number }
 
 export default function Map({ mapCenter, mapZoom, userLocation, clinics }: MapProps) {
   return (
-    <>
-      <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
-        <ChangeView center={mapCenter} zoom={mapZoom} />
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {userLocation && (
-          <Marker position={[userLocation.latitude, userLocation.longitude]} icon={userIcon}>
-            <Popup>You are here</Popup>
-          </Marker>
-        )}
-        {clinics.map(clinic => (
-          <Marker key={clinic.id} position={[clinic.lat, clinic.lon]} icon={clinicIcon}>
-            <Popup>
-              <b>{clinic.name}</b><br />
-              {clinic.address}
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
-      <style jsx global>{`
-        .user-location-marker {
-          filter: hue-rotate(120deg);
-        }
-      `}</style>
-    </>
+    <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }} className="leaflet-map-container">
+      <ChangeView center={mapCenter} zoom={mapZoom} />
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      {userLocation && (
+        <Marker position={[userLocation.latitude, userLocation.longitude]} icon={userIcon}>
+          <Popup>You are here</Popup>
+        </Marker>
+      )}
+      {clinics.map(clinic => (
+        <Marker key={clinic.id} position={[clinic.lat, clinic.lon]} icon={clinicIcon}>
+          <Popup>
+            <b>{clinic.name}</b><br />
+            {clinic.address}
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
   );
 }
