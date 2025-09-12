@@ -38,7 +38,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white">
         <Image
-          src="/hero-background.jpg"
+          src="/image.png"
           alt="A modern, bright hospital interior"
           fill
           style={{ objectFit: 'cover' }}
