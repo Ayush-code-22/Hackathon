@@ -1,12 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { HeartPulse, LogIn, Menu, LayoutDashboard, Bell, Home, Bot, Hospital, Info } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { HeartPulse, LogIn, Menu, LayoutDashboard, Bell, Home, Bot, Hospital, Info, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { auth } from '@/lib/firebase';
+import type { User as FirebaseUser } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 
 const navLinks = [
   { href: '/', label: 'Home', icon: <Home /> },
@@ -19,7 +33,37 @@ const navLinks = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
+      router.push('/login');
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Logout Failed",
+        description: "An error occurred while logging out. Please try again.",
+      });
+    }
+  };
+
 
   const NavLink = ({ href, label, icon }: { href: string; label: string, icon: React.ReactNode }) => (
     <Link
@@ -60,12 +104,46 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
-           <Button asChild>
-             <Link href="/login">
-              <LogIn className="mr-2 h-4 w-4" />
-               Login
-             </Link>
-           </Button>
+           {!loading && (
+            user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback><User /></AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">My Account</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+             <Button asChild>
+               <Link href="/login">
+                <LogIn className="mr-2 h-4 w-4" />
+                 Login
+               </Link>
+             </Button>
+            )
+           )}
         </div>
         
         {/* Mobile Navigation */}
@@ -77,7 +155,7 @@ export default function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-             <Link href="/" className="flex items-center gap-2 font-headline text-lg font-semibold mb-8">
+             <Link href="/" className="flex items-center gap-2 font-headline text-lg font-semibold mb-8" onClick={() => setIsMobileMenuOpen(false)}>
               <HeartPulse className="h-6 w-6 text-primary" />
               <span>MedLax</span>
             </Link>
@@ -85,12 +163,21 @@ export default function Header() {
               {navLinks.map((link) => (
                 <NavLink key={link.href} {...link} />
               ))}
-               <Button asChild size="lg" className="mt-4">
-                 <Link href="/login">
-                  <LogIn className="mr-2 h-4 w-4" />
-                   Login / Sign Up
-                 </Link>
-               </Button>
+              {!loading && (
+                user ? (
+                  <Button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} size="lg" className="mt-4">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                ) : (
+                  <Button asChild size="lg" className="mt-4">
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                     <LogIn className="mr-2 h-4 w-4" />
+                      Login / Sign Up
+                    </Link>
+                  </Button>
+                )
+              )}
             </nav>
           </SheetContent>
         </Sheet>
