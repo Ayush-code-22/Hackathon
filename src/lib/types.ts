@@ -1,9 +1,12 @@
 import type { SymptomCheckerOutput } from "@/ai/flows/symptom-checker";
+import type { Timestamp } from "firebase/firestore";
 
 export type Message = {
   id: string;
   role: "user" | "assistant";
   content: string | SymptomCheckerOutput;
+  userId?: string;
+  createdAt?: Timestamp;
 };
 
 export type Clinic = {

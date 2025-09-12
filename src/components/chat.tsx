@@ -13,7 +13,9 @@ import { getSymptomAnalysis } from '@/lib/actions';
 import type { Message } from '@/lib/types';
 import type { SymptomCheckerOutput } from '@/ai/flows/symptom-checker';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { auth, firestore } from '@/lib/firebase';
+import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
+
 
 const languages = [
   { value: 'en', label: 'English' },
@@ -37,26 +39,30 @@ export default function Chat() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [user, loading] = useAuthState(auth);
 
-  // Load messages from localStorage when user is available
+  // Load messages from Firestore
   useEffect(() => {
     if (user) {
-      const storedMessages = localStorage.getItem(`chatHistory_${user.uid}`);
-      if (storedMessages) {
-        setMessages(JSON.parse(storedMessages));
-      }
+      const messagesRef = collection(firestore, 'chats');
+      const q = query(
+        messagesRef,
+        where('userId', '==', user.uid),
+        orderBy('createdAt')
+      );
+
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const userMessages: Message[] = [];
+        querySnapshot.forEach((doc) => {
+          userMessages.push({ id: doc.id, ...doc.data() } as Message);
+        });
+        setMessages(userMessages);
+      });
+
+      return () => unsubscribe();
     } else if (!loading) {
       // Clear messages if user logs out
       setMessages([]);
     }
   }, [user, loading]);
-
-  // Save messages to localStorage whenever they change
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem(`chatHistory_${user.uid}`, JSON.stringify(messages));
-    }
-  }, [messages, user]);
-
 
   const AssistantMessage = ({ content }: { content: SymptomCheckerOutput }) => (
     <div className="space-y-4">
@@ -96,7 +102,7 @@ export default function Chat() {
     </div>
   );
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = async (formData: FormData) => {
     if (!user) {
       toast({
         variant: 'destructive',
@@ -109,30 +115,37 @@ export default function Chat() {
     const symptoms = formData.get('symptoms') as string;
     if (!symptoms.trim()) return;
 
-    const newUserMessage: Message = {
-      id: Date.now().toString(),
+    const newUserMessage = {
       role: 'user',
       content: symptoms,
+      userId: user.uid,
+      createdAt: serverTimestamp(),
     };
-    setMessages((prev) => [...prev, newUserMessage]);
+    
+    // Save user message to Firestore
+    const messagesRef = collection(firestore, 'chats');
+    await addDoc(messagesRef, newUserMessage);
+
     formRef.current?.reset();
 
     startTransition(async () => {
       const result = await getSymptomAnalysis(formData);
       if (result.success && result.data) {
-        const newAssistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
+        const newAssistantMessage = {
           role: 'assistant',
           content: result.data,
+          userId: user.uid,
+          createdAt: serverTimestamp(),
         };
-        setMessages((prev) => [...prev, newAssistantMessage]);
+        // Save assistant message to Firestore
+        await addDoc(messagesRef, newAssistantMessage);
       } else {
         toast({
           variant: 'destructive',
           title: 'An error occurred',
           description: result.error,
         });
-        setMessages((prev) => prev.slice(0, -1));
+        // Here you might want to remove the user's message if the assistant fails
       }
     });
   };
@@ -180,7 +193,7 @@ export default function Chat() {
                 <p>Please log in to start a conversation.</p>
               </div>
             )}
-            {user && messages.length === 0 && (
+            {user && messages.length === 0 && !loading && (
               <div className="text-center text-muted-foreground p-8">
                 <p>Welcome to MedLax!</p>
                 <p className="text-sm">Describe your symptoms to get started.</p>
@@ -208,7 +221,7 @@ export default function Chat() {
                   {typeof message.content === 'string' ? (
                     <p className="text-sm">{message.content}</p>
                   ) : (
-                    <AssistantMessage content={message.content} />
+                    <AssistantMessage content={message.content as SymptomCheckerOutput} />
                   )}
                 </div>
                 {message.role === 'user' && (
