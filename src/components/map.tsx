@@ -4,7 +4,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import type { Clinic } from '@/lib/types';
 import L from 'leaflet';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 // Fix for default icon issue with Leaflet and React
 const userIcon = new L.Icon({
@@ -45,8 +45,28 @@ function ChangeView({ center, zoom }: { center: [number, number], zoom: number }
 }
 
 export default function Map({ mapCenter, mapZoom, userLocation, clinics }: MapProps) {
+  const mapRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    // This is the cleanup function.
+    // It runs when the component unmounts.
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+
   return (
-    <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }} className="leaflet-map-container">
+    <MapContainer 
+        whenCreated={map => mapRef.current = map}
+        center={mapCenter} 
+        zoom={mapZoom} 
+        style={{ height: '100%', width: '100%' }} 
+        className="leaflet-map-container"
+    >
       <ChangeView center={mapCenter} zoom={mapZoom} />
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
