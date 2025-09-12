@@ -1,14 +1,44 @@
+'use client';
+
+import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Hospital, MapPin, Stethoscope } from "lucide-react";
+import { Hospital, MapPin, Stethoscope, LocateFixed } from "lucide-react";
 import { nearbyClinics } from "@/lib/data";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ClinicsPage() {
+  const { toast } = useToast();
+  const [locating, setLocating] = useState(false);
+
+  const handleFindNearby = () => {
+    setLocating(true);
+    toast({
+      title: "Locating...",
+      description: "Please allow location access in your browser.",
+    });
+
+    // Simulate geolocation API call
+    setTimeout(() => {
+      setLocating(false);
+      // In a real app, you would use navigator.geolocation.getCurrentPosition
+      // and then filter clinics based on the user's coordinates.
+      toast({
+        title: "Clinics updated!",
+        description: "Showing clinics in your area.",
+      });
+    }, 2000);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-headline font-bold text-primary">Find a Clinic or Hospital</h1>
         <p className="mt-2 text-lg text-muted-foreground">Nearby medical facilities for your convenience.</p>
+        <Button onClick={handleFindNearby} disabled={locating} className="mt-4">
+          <LocateFixed className="mr-2 h-4 w-4" />
+          {locating ? "Locating..." : "Find Clinics Near Me"}
+        </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {nearbyClinics.map((clinic) => (
