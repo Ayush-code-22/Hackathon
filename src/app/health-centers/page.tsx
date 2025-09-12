@@ -25,7 +25,7 @@ async function getHealthCenterData(): Promise<HealthCenterData[]> {
     }
 
     const data = await response.json();
-    return data.records;
+    return data.records || [];
   } catch (error) {
     console.error("Failed to fetch health center data:", error);
     return [];
@@ -35,7 +35,28 @@ async function getHealthCenterData(): Promise<HealthCenterData[]> {
 export default async function HealthCentersPage() {
   const healthCenterData = await getHealthCenterData();
 
-  const sortedData = healthCenterData.sort((a, b) => a.state_uts.localeCompare(b.state_uts));
+  if (!healthCenterData || healthCenterData.length === 0) {
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <div className="text-center mb-12">
+                <h1 className="text-4xl font-headline font-bold text-primary">Health Centers in India</h1>
+                <p className="mt-2 text-lg text-muted-foreground">State/UT-wise count of functional Primary and Community Health Centers.</p>
+            </div>
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+                Could not load the health center data. The API might be temporarily unavailable or returned no data. Please try again later.
+              </AlertDescription>
+            </Alert>
+        </div>
+    );
+  }
+
+  const sortedData = [...healthCenterData].sort((a, b) => 
+    (a.state_uts || "").localeCompare(b.state_uts || "")
+  );
+
 
   const formatCenterData = (data: string) => {
     if (!data || !data.includes('/')) return data || 'N/A';
@@ -57,7 +78,6 @@ export default async function HealthCentersPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {sortedData.length > 0 ? (
             <div className="overflow-x-auto">
                 <Table>
                 <TableHeader>
@@ -69,24 +89,17 @@ export default async function HealthCentersPage() {
                 </TableHeader>
                 <TableBody>
                     {sortedData.map((record) => (
-                    <TableRow key={record.state_uts}>
-                        <TableCell className="font-medium">{record.state_uts}</TableCell>
-                        <TableCell className="text-right">{formatCenterData(record.no_of_phcs_functional_against_norm)}</TableCell>
-                        <TableCell className="text-right">{formatCenterData(record.no_of_chcs_functional_against_norm)}</TableCell>
-                    </TableRow>
+                    record.state_uts && (
+                        <TableRow key={record.state_uts}>
+                            <TableCell className="font-medium">{record.state_uts}</TableCell>
+                            <TableCell className="text-right">{formatCenterData(record.no_of_phcs_functional_against_norm)}</TableCell>
+                            <TableCell className="text-right">{formatCenterData(record.no_of_chcs_functional_against_norm)}</TableCell>
+                        </TableRow>
+                    )
                     ))}
                 </TableBody>
                 </Table>
             </div>
-          ) : (
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>
-                Could not load the health center data. The API might be temporarily unavailable. Please try again later.
-              </AlertDescription>
-            </Alert>
-          )}
         </CardContent>
       </Card>
     </div>
