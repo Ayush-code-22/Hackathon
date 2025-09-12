@@ -14,7 +14,7 @@ import type { Message } from '@/lib/types';
 import type { SymptomCheckerOutput } from '@/ai/flows/symptom-checker';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, firestore } from '@/lib/firebase';
-import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 
 const languages = [
@@ -43,10 +43,10 @@ export default function Chat() {
   useEffect(() => {
     if (user) {
       const messagesRef = collection(firestore, 'chats');
+      // The query no longer has orderBy, avoiding the need for a composite index.
       const q = query(
         messagesRef,
-        where('userId', '==', user.uid),
-        orderBy('createdAt')
+        where('userId', '==', user.uid)
       );
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -54,6 +54,14 @@ export default function Chat() {
         querySnapshot.forEach((doc) => {
           userMessages.push({ id: doc.id, ...doc.data() } as Message);
         });
+        
+        // Sort messages by timestamp on the client side
+        userMessages.sort((a, b) => {
+            const aTime = a.createdAt ? (a.createdAt as Timestamp).toMillis() : 0;
+            const bTime = b.createdAt ? (b.createdAt as Timestamp).toMillis() : 0;
+            return aTime - bTime;
+        });
+
         setMessages(userMessages);
       });
 

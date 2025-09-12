@@ -6,7 +6,7 @@ export type Message = {
   role: "user" | "assistant";
   content: string | SymptomCheckerOutput;
   userId?: string;
-  createdAt?: Timestamp;
+  createdAt?: Timestamp | { seconds: number, nanoseconds: number };
 };
 
 export type Clinic = {
