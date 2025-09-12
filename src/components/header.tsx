@@ -2,33 +2,36 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HeartPulse, Phone, Menu, MessageSquare } from 'lucide-react';
+import { HeartPulse, LogIn, Menu, LayoutDashboard, Bell, Home, Bot, Hospital, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/chatbot', label: 'Chatbot' },
-  { href: '/clinics', label: 'Find a Clinic' },
-  { href: '/about', label: 'About' },
+  { href: '/', label: 'Home', icon: <Home /> },
+  { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard /> },
+  { href: '/chatbot', label: 'Chatbot', icon: <Bot /> },
+  { href: '/clinics', label: 'Find a Clinic', icon: <Hospital /> },
+  { href: '/alerts', label: 'Alerts', icon: <Bell /> },
+  { href: '/about', label: 'About', icon: <Info /> },
 ];
 
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const NavLink = ({ href, label }: { href: string; label: string }) => (
+  const NavLink = ({ href, label, icon }: { href: string; label: string, icon: React.ReactNode }) => (
     <Link
       href={href}
       className={cn(
-        'text-sm font-medium transition-colors hover:text-primary',
+        'flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary',
         pathname === href ? 'text-primary' : 'text-muted-foreground'
       )}
       onClick={() => setIsMobileMenuOpen(false)}
     >
-      {label}
+      {icon}
+      <span>{label}</span>
     </Link>
   );
 
@@ -43,16 +46,25 @@ export default function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                'text-sm font-medium transition-colors hover:text-primary',
+                pathname === link.href ? 'text-primary' : 'text-muted-foreground'
+              )}
+            >
+              {link.label}
+            </Link>
           ))}
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
-           <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-             <a href="/chatbot">
-              <MessageSquare className="mr-2 h-4 w-4" />
-               Get Assistance
-             </a>
+           <Button asChild>
+             <Link href="/login">
+              <LogIn className="mr-2 h-4 w-4" />
+               Login
+             </Link>
            </Button>
         </div>
         
@@ -69,15 +81,15 @@ export default function Header() {
               <HeartPulse className="h-6 w-6 text-primary" />
               <span>MediMate</span>
             </Link>
-            <nav className="grid gap-6 text-lg font-medium">
+            <nav className="grid gap-4 text-base font-medium">
               {navLinks.map((link) => (
                 <NavLink key={link.href} {...link} />
               ))}
-               <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                 <a href="/chatbot">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                   Get Assistance
-                 </a>
+               <Button asChild size="lg" className="mt-4">
+                 <Link href="/login">
+                  <LogIn className="mr-2 h-4 w-4" />
+                   Login / Sign Up
+                 </Link>
                </Button>
             </nav>
           </SheetContent>
