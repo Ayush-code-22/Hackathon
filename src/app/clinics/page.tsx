@@ -77,10 +77,17 @@ export default function ClinicsPage() {
 
           if (result.success && result.data) {
             setClinics(result.data);
-            toast({
-              title: "Clinics Found!",
-              description: "Showing nearby medical facilities.",
-            });
+            if (result.data.length > 0) {
+              toast({
+                title: "Clinics Found!",
+                description: "Showing nearby medical facilities.",
+              });
+            } else {
+              toast({
+                title: "No Clinics Found",
+                description: "No clinics were found within a 5km radius.",
+              });
+            }
           } else {
             setError(result.error || "Could not fetch clinics.");
           }
@@ -207,7 +214,7 @@ export default function ClinicsPage() {
                   ))}
                 </MapContainer>
               ) : (
-                <p className="text-muted-foreground">The map will be displayed here.</p>
+                <p className="text-muted-foreground">Loading Map...</p>
               )}
            </div>
         </div>
