@@ -34,61 +34,63 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="container mx-auto px-4">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <div className="py-16 md:py-24">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6 text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary leading-tight">
-              AI-Powered Health Awareness Chatbot
+      <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white">
+        <Image
+          src="https://picsum.photos/seed/health-bg/1600/900"
+          alt="Abstract background with a health and technology theme"
+          fill
+          style={{ objectFit: 'cover' }}
+          className="absolute inset-0 z-0"
+          data-ai-hint="health technology"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/50 z-10" />
+        <div className="relative z-20 container mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto space-y-6">
+            <h1 className="text-4xl md:text-6xl font-headline font-bold leading-tight">
+              AI-Powered Health Awareness
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg md:text-xl text-white/90">
               Get instant, reliable health information and symptom analysis. Your personal health assistant is here to help, anytime.
             </p>
-            <div className="flex gap-4 justify-center md:justify-start">
+            <div className="flex gap-4 justify-center">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Link href="/chatbot">Try the Chatbot</Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
+              <Button asChild size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-primary">
                 <Link href="/about">Learn More</Link>
               </Button>
             </div>
           </div>
-          <div>
-            <Image
-              src="https://picsum.photos/seed/health-tech/600/500"
-              alt="A doctor using a tablet with a health application"
-              width={600}
-              height={500}
-              className="rounded-lg shadow-2xl mx-auto"
-              data-ai-hint="doctor technology"
-            />
-          </div>
         </div>
-      </div>
+      </section>
 
       {/* Features Section */}
-      <div className="py-16 md:py-24 border-t">
-        <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Key Features</h2>
-            <p className="mt-2 text-lg text-muted-foreground">Everything you need for better health awareness.</p>
+      <section className="bg-background">
+        <div className="container mx-auto px-4 py-16 md:py-24">
+          <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Key Features</h2>
+              <p className="mt-2 text-lg text-muted-foreground">Everything you need for better health awareness.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {features.map((feature) => (
+                  <Card key={feature.title} className="text-center shadow-lg hover:shadow-xl hover:-translate-y-2 transition-transform duration-300">
+                      <CardHeader className="items-center">
+                          <div className="p-4 bg-primary/10 rounded-full mb-4">
+                              {feature.icon}
+                          </div>
+                          <CardTitle className="font-headline text-xl">{feature.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-muted-foreground">{feature.description}</p>
+                      </CardContent>
+                  </Card>
+              ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature) => (
-                <Card key={feature.title} className="text-center shadow-lg hover:shadow-xl hover:-translate-y-2 transition-transform duration-300">
-                    <CardHeader className="items-center">
-                        <div className="p-4 bg-primary/10 rounded-full mb-4">
-                            {feature.icon}
-                        </div>
-                        <CardTitle className="font-headline text-xl">{feature.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">{feature.description}</p>
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
-      </div>
+      </section>
     </div>
   );
 }
