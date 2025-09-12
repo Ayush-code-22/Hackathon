@@ -38,12 +38,12 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white">
         <Image
-          src="https://picsum.photos/seed/health-abstract/1600/900"
-          alt="Abstract medical background"
+          src="https://picsum.photos/seed/doctor/1600/900"
+          alt="A doctor in a hospital setting"
           fill
           style={{ objectFit: 'cover' }}
           className="absolute inset-0 z-0"
-          data-ai-hint="health abstract"
+          data-ai-hint="doctor hospital"
           priority
         />
         <div className="absolute inset-0 bg-black/50 z-10" />
