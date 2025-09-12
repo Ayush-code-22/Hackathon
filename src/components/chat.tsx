@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { getSymptomAnalysis } from '@/lib/actions';
 import type { Message } from '@/lib/types';
 import type { SymptomCheckerOutput } from '@/ai/flows/symptom-checker';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
 
 const languages = [
   { value: 'en', label: 'English' },
@@ -33,6 +35,28 @@ export default function Chat() {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [user, loading] = useAuthState(auth);
+
+  // Load messages from localStorage when user is available
+  useEffect(() => {
+    if (user) {
+      const storedMessages = localStorage.getItem(`chatHistory_${user.uid}`);
+      if (storedMessages) {
+        setMessages(JSON.parse(storedMessages));
+      }
+    } else if (!loading) {
+      // Clear messages if user logs out
+      setMessages([]);
+    }
+  }, [user, loading]);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem(`chatHistory_${user.uid}`, JSON.stringify(messages));
+    }
+  }, [messages, user]);
+
 
   const AssistantMessage = ({ content }: { content: SymptomCheckerOutput }) => (
     <div className="space-y-4">
@@ -73,6 +97,15 @@ export default function Chat() {
   );
 
   const handleSubmit = (formData: FormData) => {
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Not Logged In',
+        description: 'You must be logged in to use the chatbot.',
+      });
+      return;
+    }
+
     const symptoms = formData.get('symptoms') as string;
     if (!symptoms.trim()) return;
 
@@ -106,10 +139,13 @@ export default function Chat() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: scrollAreaRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
+      const scrollElement = scrollAreaRef.current.querySelector('div');
+       if (scrollElement) {
+         scrollElement.scrollTo({
+           top: scrollElement.scrollHeight,
+           behavior: 'smooth',
+         });
+       }
     }
   }, [messages]);
 
@@ -139,7 +175,12 @@ export default function Chat() {
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full" ref={scrollAreaRef}>
           <div className="p-6 space-y-6">
-            {messages.length === 0 && (
+            {!user && !loading && (
+              <div className="text-center text-muted-foreground p-8">
+                <p>Please log in to start a conversation.</p>
+              </div>
+            )}
+            {user && messages.length === 0 && (
               <div className="text-center text-muted-foreground p-8">
                 <p>Welcome to MedLax!</p>
                 <p className="text-sm">Describe your symptoms to get started.</p>
@@ -209,9 +250,9 @@ export default function Chat() {
                 formRef.current?.requestSubmit();
               }
             }}
-            disabled={isPending}
+            disabled={isPending || !user}
           />
-          <Button type="submit" size="icon" disabled={isPending}>
+          <Button type="submit" size="icon" disabled={isPending || !user}>
             <Send className="h-4 w-4" />
           </Button>
         </form>
