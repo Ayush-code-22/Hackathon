@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BarChart as BarChartIcon, Loader2, MessageSquare, AlertTriangle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { Message } from '@/lib/types';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 type ChartData = {
   date: string;
@@ -63,7 +63,11 @@ export default function AnalyticsPage() {
               user: dailyData[date].user,
               assistant: dailyData[date].assistant,
             }))
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            .sort((a, b) => {
+              const dateA = parse(a.date, 'MMM d', new Date());
+              const dateB = parse(b.date, 'MMM d', new Date());
+              return dateA.getTime() - dateB.getTime();
+            });
 
 
           setChartData(sortedChartData);
