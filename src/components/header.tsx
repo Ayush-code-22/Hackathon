@@ -2,15 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HeartPulse, Phone, Menu } from 'lucide-react';
+import { HeartPulse, Phone, Menu, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 const navLinks = [
-  { href: '/', label: 'Symptom Checker' },
+  { href: '/', label: 'Home' },
+  { href: '/chatbot', label: 'Chatbot' },
   { href: '/clinics', label: 'Find a Clinic' },
+  { href: '/about', label: 'About' },
 ];
 
 export default function Header() {
@@ -46,12 +48,12 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
-          <Button variant="outline" size="sm" asChild>
-            <a href="tel:911">
-              <Phone className="mr-2 h-4 w-4" />
-              Emergency: 911
-            </a>
-          </Button>
+           <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+             <a href="/chatbot">
+              <MessageSquare className="mr-2 h-4 w-4" />
+               Get Assistance
+             </a>
+           </Button>
         </div>
         
         {/* Mobile Navigation */}
@@ -63,16 +65,20 @@ export default function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-            <nav className="grid gap-6 text-lg font-medium mt-8">
+             <Link href="/" className="flex items-center gap-2 font-headline text-lg font-semibold mb-8">
+              <HeartPulse className="h-6 w-6 text-primary" />
+              <span>MediMate</span>
+            </Link>
+            <nav className="grid gap-6 text-lg font-medium">
               {navLinks.map((link) => (
                 <NavLink key={link.href} {...link} />
               ))}
-               <Button variant="outline" size="sm" asChild>
-                <a href="tel:911">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Emergency: 911
-                </a>
-              </Button>
+               <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+                 <a href="/chatbot">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                   Get Assistance
+                 </a>
+               </Button>
             </nav>
           </SheetContent>
         </Sheet>
