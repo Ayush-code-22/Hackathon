@@ -39,7 +39,7 @@ export default function Home() {
       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white">
         <Image
           src="/image.png"
-          alt="A modern, bright hospital interior"
+          alt="A diverse group of smiling healthcare professionals"
           fill
           style={{ objectFit: 'cover' }}
           className="absolute inset-0 z-0"
