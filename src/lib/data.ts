@@ -1,41 +1,56 @@
+
 import type { Clinic, HealthAlert } from '@/lib/types';
 
+// Coordinates are approximate for demonstration purposes.
+// User's hypothetical location is around: 40.7128, -74.0060 (New York, NY)
 export const nearbyClinics: Clinic[] = [
   {
     id: 1,
-    name: 'Community General Hospital',
-    address: '123 Main St, Springfield, USA',
+    name: 'Downtown Medical Center',
+    address: '123 Main St, Anytown, USA',
     type: 'Hospital',
+    lat: 40.7150,
+    lon: -74.0080,
   },
   {
     id: 2,
     name: 'Oakwood Community Clinic',
-    address: '456 Oak Ave, Springfield, USA',
+    address: '456 Oak Ave, Anytown, USA',
     type: 'Clinic',
+    lat: 40.7050,
+    lon: -74.0120,
   },
   {
     id: 3,
-    name: 'Springfield Children\'s Hospital',
-    address: '789 Elm St, Springfield, USA',
+    name: 'Anytown General Hospital',
+    address: '789 Pine St, Anytown, USA',
     type: 'Hospital',
+    lat: 40.7200,
+    lon: -73.9980,
   },
   {
     id: 4,
-    name: 'Downtown Urgent Care',
-    address: '101 Center Rd, Springfield, USA',
+    name: 'Central Urgent Care',
+    address: '101 Center Rd, Anytown, USA',
     type: 'Clinic',
+    lat: 40.7100,
+    lon: -74.0010,
   },
   {
     id: 5,
     name: 'Riverbend Health Services',
-    address: '212 River Rd, Springfield, USA',
+    address: '212 River Rd, Anytown, USA',
     type: 'Clinic',
+    lat: 40.7250,
+    lon: -74.0150,
   },
   {
     id: 6,
     name: 'Mercy Heart Institute',
-    address: '333 Wellness Ct, Springfield, USA',
+    address: '333 Wellness Ct, Anytown, USA',
     type: 'Hospital',
+    lat: 40.6990,
+    lon: -73.9900,
   },
 ];
 

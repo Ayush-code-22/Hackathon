@@ -1,3 +1,4 @@
+
 import type { SymptomCheckerOutput } from "@/ai/flows/symptom-checker";
 import type { Timestamp } from "firebase/firestore";
 
@@ -14,6 +15,9 @@ export type Clinic = {
   name: string;
   address: string;
   type: 'Hospital' | 'Clinic';
+  lat: number;
+  lon: number;
+  distance?: number;
 };
 
 export type HealthAlert = {
