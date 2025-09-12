@@ -1,56 +1,55 @@
 
 import type { Clinic, HealthAlert } from '@/lib/types';
 
-// Coordinates are approximate for demonstration purposes.
-// User's hypothetical location is around: 40.7128, -74.0060 (New York, NY)
+// Coordinates are approximate for demonstration purposes for the Kolkata region.
 export const nearbyClinics: Clinic[] = [
   {
-    id: 1,
-    name: 'Downtown Medical Center',
-    address: '123 Main St, Anytown, USA',
+    id: 'ChIJb-Iq-K5-AjoRQ7T2IDc_lEM',
+    name: 'Apollo Gleneagles Hospitals',
+    address: '58, Canal Circular Rd, Kadapara, Kolkata',
     type: 'Hospital',
-    lat: 40.7150,
-    lon: -74.0080,
+    lat: 22.5750,
+    lon: 88.3900,
   },
   {
-    id: 2,
-    name: 'Oakwood Community Clinic',
-    address: '456 Oak Ave, Anytown, USA',
-    type: 'Clinic',
-    lat: 40.7050,
-    lon: -74.0120,
-  },
-  {
-    id: 3,
-    name: 'Anytown General Hospital',
-    address: '789 Pine St, Anytown, USA',
+    id: 'ChIJz-qg_tp-AjoRGf_oD14xL2o',
+    name: 'AMRI Hospital, Salt Lake',
+    address: 'JC 16 & 17, Salt Lake Bypass, Salt Lake City, Kolkata',
     type: 'Hospital',
-    lat: 40.7200,
-    lon: -73.9980,
+    lat: 22.5790,
+    lon: 88.4090,
   },
   {
-    id: 4,
-    name: 'Central Urgent Care',
-    address: '101 Center Rd, Anytown, USA',
-    type: 'Clinic',
-    lat: 40.7100,
-    lon: -74.0010,
-  },
-  {
-    id: 5,
-    name: 'Riverbend Health Services',
-    address: '212 River Rd, Anytown, USA',
-    type: 'Clinic',
-    lat: 40.7250,
-    lon: -74.0150,
-  },
-  {
-    id: 6,
-    name: 'Mercy Heart Institute',
-    address: '333 Wellness Ct, Anytown, USA',
+    id: 'ChIJ1-dYBtB-AjoR_o9qI2T_v7I',
+    name: 'Fortis Hospital, Anandapur',
+    address: '730, Anandapur, E M Bypass Road, Kolkata',
     type: 'Hospital',
-    lat: 40.6990,
-    lon: -73.9900,
+    lat: 22.5200,
+    lon: 88.4000,
+  },
+  {
+    id: 'ChIJP5X5-sZ-AjoRFg5gW_Jc-1o',
+    name: 'Peerless Hospital',
+    address: '360, Panchasayar Rd, Sahid Smirity Colony, Pancha Sayar, Kolkata',
+    type: 'Hospital',
+    lat: 22.4840,
+    lon: 88.3990,
+  },
+  {
+    id: 'ChIJjW-v_sV-AjoR-z4e_j4f-9o',
+    name: 'Ruby General Hospital',
+    address: 'Kasba Golpark, E M Bypass, Kolkata',
+    type: 'Hospital',
+    lat: 22.5110,
+    lon: 88.3950,
+  },
+  {
+    id: 'ChIJ_x5f_rJ-AjoRJ_j_k_j_k_k',
+    name: 'ILS Hospitals, Salt Lake',
+    address: 'DD-6, Salt Lake, Sector-1, Kolkata',
+    type: 'Clinic',
+    lat: 22.5830,
+    lon: 88.4080,
   },
 ];
 
