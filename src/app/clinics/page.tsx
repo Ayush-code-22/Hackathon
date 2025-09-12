@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Hospital, MapPin, Stethoscope, LocateFixed, Loader2, AlertTriangle, Route } from "lucide-react";
@@ -9,6 +9,32 @@ import type { Clinic } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { findNearbyClinics } from "@/lib/actions";
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+
+// Fix for default icon issue with Leaflet and React
+const userIcon = new L.Icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+  className: 'user-location-marker'
+});
+
+const clinicIcon = new L.Icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 
 export default function ClinicsPage() {
   const { toast } = useToast();
@@ -17,13 +43,18 @@ export default function ClinicsPage() {
   const [error, setError] = useState<string | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number } | null>(null);
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([20.5937, 78.9629]); // Default to India
+  const [mapZoom, setMapZoom] = useState(4);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleFindNearby = () => {
     setLocating(true);
     setError(null);
     setClinics([]);
-    setMapUrl(null);
     setUserLocation(null);
 
     if (!navigator.geolocation) {
@@ -36,6 +67,8 @@ export default function ClinicsPage() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ latitude, longitude });
+        setMapCenter([latitude, longitude]);
+        setMapZoom(13);
         setLocating(false);
         setFetchingClinics(true);
 
@@ -44,19 +77,6 @@ export default function ClinicsPage() {
 
           if (result.success && result.data) {
             setClinics(result.data);
-            if (result.data.length > 0) {
-              const searchParams = new URLSearchParams();
-              const markers = result.data.map(clinic => `${clinic.lat},${clinic.lon}`).join('|');
-              searchParams.set('q', markers);
-              
-              const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-              if (apiKey) {
-                searchParams.set('key', apiKey);
-              }
-              
-              setMapUrl(`https://www.google.com/maps/embed/v1/view?center=${latitude},${longitude}&zoom=12&key=${apiKey}`);
-            }
-            
             toast({
               title: "Clinics Found!",
               description: "Showing nearby medical facilities.",
@@ -96,7 +116,7 @@ export default function ClinicsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-headline font-bold text-primary">Find a Clinic or Hospital</h1>
-        <p className="mt-2 text-lg text-muted-foreground">Find real medical facilities near you using Google Maps.</p>
+        <p className="mt-2 text-lg text-muted-foreground">Find real medical facilities near you.</p>
         <Button onClick={handleFindNearby} disabled={isLoading} className="mt-4">
           {isLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -165,20 +185,38 @@ export default function ClinicsPage() {
           ))}
         </div>
         <div className="lg:col-span-2">
-            {mapUrl ? (
-                 <iframe
-                    className="w-full h-[600px] rounded-lg shadow-2xl border-0"
-                    loading="lazy"
-                    allowFullScreen
-                    src={mapUrl}>
-                </iframe>
-            ) : (
-                <div className="w-full h-[600px] rounded-lg bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground">The map will be displayed here.</p>
-                </div>
-            )}
+           <div className="w-full h-[600px] rounded-lg bg-muted flex items-center justify-center overflow-hidden shadow-2xl">
+              {isClient ? (
+                <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {userLocation && (
+                    <Marker position={[userLocation.latitude, userLocation.longitude]} icon={userIcon}>
+                      <Popup>You are here</Popup>
+                    </Marker>
+                  )}
+                  {clinics.map(clinic => (
+                    <Marker key={clinic.id} position={[clinic.lat, clinic.lon]} icon={clinicIcon}>
+                      <Popup>
+                        <b>{clinic.name}</b><br />
+                        {clinic.address}
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MapContainer>
+              ) : (
+                <p className="text-muted-foreground">The map will be displayed here.</p>
+              )}
+           </div>
         </div>
       </div>
+      <style jsx global>{`
+        .user-location-marker {
+          filter: hue-rotate(120deg);
+        }
+      `}</style>
     </div>
   );
 }
