@@ -8,35 +8,67 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
     if (email.trim() === "" || password.trim() === "") {
       toast({
         variant: "destructive",
         title: "Missing Information",
         description: "Please enter both email and password.",
       });
+      setLoading(false);
       return;
     }
-    // In a real application, you would verify the email and password here.
-    // For this prototype, we'll just redirect to the dashboard.
-    router.push("/dashboard");
+
+    try {
+      if (isSignUp) {
+        // Sign up a new user
+        await createUserWithEmailAndPassword(auth, email, password);
+        toast({
+          title: "Account Created",
+          description: "You have successfully signed up! Please log in.",
+        });
+        setIsSignUp(false); // Switch to login view after successful sign up
+      } else {
+        // Log in an existing user
+        await signInWithEmailAndPassword(auth, email, password);
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
+        router.push("/dashboard");
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Failed",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-background px-4">
       <Card className="w-full max-w-md shadow-2xl">
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSubmit}>
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-headline font-bold text-primary">Login or Sign Up</CardTitle>
-            <CardDescription>Enter your email and password to access your account.</CardDescription>
+            <CardTitle className="text-3xl font-headline font-bold text-primary">{isSignUp ? 'Create an Account' : 'Login'}</CardTitle>
+            <CardDescription>Enter your email and password to {isSignUp ? 'get started' : 'access your account'}.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -48,6 +80,7 @@ export default function LoginPage() {
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -59,12 +92,16 @@ export default function LoginPage() {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              Login
+            <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>
+              {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Login')}
+            </Button>
+            <Button variant="link" type="button" onClick={() => setIsSignUp(!isSignUp)}>
+              {isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
             </Button>
             <p className="text-xs text-muted-foreground text-center">
               By continuing, you agree to our{" "}
