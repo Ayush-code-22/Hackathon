@@ -11,7 +11,7 @@ export type Message = {
 };
 
 export type Clinic = {
-  id: number;
+  id: string; // Changed to string for Google Places ID
   name: string;
   address: string;
   type: 'Hospital' | 'Clinic';
