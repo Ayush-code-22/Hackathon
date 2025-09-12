@@ -3,6 +3,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import Header from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
+import { FirebaseAuthProvider } from '@/components/firebase-auth-provider';
 
 export const metadata: Metadata = {
   title: 'MedLax - Your AI Health Assistant',
@@ -25,11 +26,13 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
-        <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-        </div>
-        <Toaster />
+        <FirebaseAuthProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+          </div>
+          <Toaster />
+        </FirebaseAuthProvider>
       </body>
     </html>
   );

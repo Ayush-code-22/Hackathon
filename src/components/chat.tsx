@@ -12,9 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { getSymptomAnalysis } from '@/lib/actions';
 import type { Message } from '@/lib/types';
 import type { SymptomCheckerOutput } from '@/ai/flows/symptom-checker';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firestore } from '@/lib/firebase';
-import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { useAuth } from '@/components/firebase-auth-provider';
+import { collection, addDoc, query, where, onSnapshot, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 
 const languages = [
@@ -37,11 +36,11 @@ export default function Chat() {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [user, loading] = useAuthState(auth);
+  const { user, loading, firestore } = useAuth();
 
   // Load messages from Firestore
   useEffect(() => {
-    if (user) {
+    if (user && firestore) {
       const messagesRef = collection(firestore, 'chats');
       // The query no longer has orderBy, avoiding the need for a composite index.
       const q = query(
@@ -70,7 +69,7 @@ export default function Chat() {
       // Clear messages if user logs out
       setMessages([]);
     }
-  }, [user, loading]);
+  }, [user, loading, firestore]);
 
   const AssistantMessage = ({ content }: { content: SymptomCheckerOutput }) => (
     <div className="space-y-4">
@@ -118,6 +117,14 @@ export default function Chat() {
         description: 'You must be logged in to use the chatbot.',
       });
       return;
+    }
+    if (!firestore) {
+        toast({
+            variant: 'destructive',
+            title: 'Database Error',
+            description: 'Could not connect to the database.',
+        });
+        return;
     }
 
     const symptoms = formData.get('symptoms') as string;

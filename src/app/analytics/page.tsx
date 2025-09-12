@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firestore } from '@/lib/firebase';
+import { useAuth } from '@/components/firebase-auth-provider';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BarChart as BarChartIcon, Loader2, MessageSquare, AlertTriangle } from 'lucide-react';
@@ -17,14 +16,14 @@ type ChartData = {
 };
 
 export default function AnalyticsPage() {
-  const [user, loading] = useAuthState(auth);
+  const { user, loading, firestore } = useAuth();
   const [stats, setStats] = useState({ totalMessages: 0, userMessages: 0, assistantMessages: 0 });
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
+    if (user && firestore) {
       const fetchChatData = async () => {
         try {
           setIsLoading(true);
@@ -84,7 +83,7 @@ export default function AnalyticsPage() {
     } else if (!loading) {
       setIsLoading(false);
     }
-  }, [user, loading]);
+  }, [user, loading, firestore]);
 
   if (loading || isLoading) {
     return (

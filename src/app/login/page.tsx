@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { auth } from '@/lib/firebase';
+import { useAuth } from "@/components/firebase-auth-provider";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 export default function LoginPage() {
@@ -18,9 +18,18 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { auth } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!auth) {
+        toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Authentication service is not available. Please try again later.",
+        });
+        return;
+    }
     setLoading(true);
 
     if (email.trim() === "" || password.trim() === "") {

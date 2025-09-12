@@ -6,8 +6,8 @@ import { HeartPulse, LogIn, Menu, LayoutDashboard, Bell, Home, Bot, Hospital, In
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
-import { auth } from '@/lib/firebase';
+import { useState } from 'react';
+import { useAuth } from '@/components/firebase-auth-provider';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 
 const navLinks = [
@@ -36,17 +35,19 @@ export default function Header() {
   const router = useRouter();
   const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, loading] = useAuthState(auth);
+  const { auth, user, loading } = useAuth();
 
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
-      });
-      router.push('/login');
+      if (auth) {
+        await signOut(auth);
+        toast({
+          title: "Logged Out",
+          description: "You have been successfully logged out.",
+        });
+        router.push('/login');
+      }
     } catch (error) {
       toast({
         variant: "destructive",
@@ -110,9 +111,11 @@ export default function Header() {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">My Account</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
+                      {user.email &&
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      }
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
