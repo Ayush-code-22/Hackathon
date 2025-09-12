@@ -15,10 +15,15 @@ import type { SymptomCheckerOutput } from '@/ai/flows/symptom-checker';
 
 const languages = [
   { value: 'en', label: 'English' },
-  { value: 'es', label: 'Español' },
-  { value: 'fr', label: 'Français' },
-  { value: 'de', label: 'Deutsch' },
   { value: 'hi', label: 'हिन्दी' },
+  { value: 'bn', label: 'বাংলা' },
+  { value: 'te', label: 'తెలుగు' },
+  { value: 'mr', label: 'मराठी' },
+  { value: 'ta', label: 'தமிழ்' },
+  { value: 'gu', label: 'ગુજરાતી' },
+  { value: 'kn', label: 'ಕನ್ನಡ' },
+  { value: 'ml', label: 'മലയാളം' },
+  { value: 'pa', label: 'ਪੰਜਾਬੀ' },
 ];
 
 export default function Chat() {
