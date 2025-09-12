@@ -1,9 +1,10 @@
 
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import type { Clinic } from '@/lib/types';
 import L from 'leaflet';
+import { useEffect } from 'react';
 
 // Fix for default icon issue with Leaflet and React
 const userIcon = new L.Icon({
@@ -35,10 +36,19 @@ type MapProps = {
   clinics: Clinic[];
 };
 
+function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [map, center, zoom]);
+  return null;
+}
+
 export default function Map({ mapCenter, mapZoom, userLocation, clinics }: MapProps) {
   return (
     <>
-      <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }} key={mapCenter.toString()}>
+      <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
+        <ChangeView center={mapCenter} zoom={mapZoom} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
