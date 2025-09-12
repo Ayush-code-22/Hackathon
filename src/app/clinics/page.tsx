@@ -10,22 +10,21 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { findNearbyClinics } from "@/lib/actions";
 
-type Location = {
-  latitude: number;
-  longitude: number;
-};
-
 export default function ClinicsPage() {
   const { toast } = useToast();
   const [locating, setLocating] = useState(false);
   const [fetchingClinics, setFetchingClinics] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
+  const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number } | null>(null);
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
 
   const handleFindNearby = () => {
     setLocating(true);
     setError(null);
     setClinics([]);
+    setMapUrl(null);
+    setUserLocation(null);
 
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
@@ -36,6 +35,7 @@ export default function ClinicsPage() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        setUserLocation({ latitude, longitude });
         setLocating(false);
         setFetchingClinics(true);
 
@@ -44,6 +44,19 @@ export default function ClinicsPage() {
 
           if (result.success && result.data) {
             setClinics(result.data);
+            if (result.data.length > 0) {
+              const searchParams = new URLSearchParams();
+              const markers = result.data.map(clinic => `${clinic.lat},${clinic.lon}`).join('|');
+              searchParams.set('q', markers);
+              
+              const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+              if (apiKey) {
+                searchParams.set('key', apiKey);
+              }
+              
+              setMapUrl(`https://www.google.com/maps/embed/v1/view?center=${latitude},${longitude}&zoom=12&key=${apiKey}`);
+            }
+            
             toast({
               title: "Clinics Found!",
               description: "Showing nearby medical facilities.",
@@ -103,53 +116,68 @@ export default function ClinicsPage() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-
-      {clinics.length === 0 && !isLoading && !error && (
-        <div className="text-center text-muted-foreground">
-          <p>Click the button to find clinics near your location.</p>
-        </div>
-      )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {clinics.map((clinic) => (
-          <Card key={clinic.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="flex-row items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-full">
-                {clinic.type === 'Hospital' ? 
-                  <Hospital className="h-8 w-8 text-primary" /> : 
-                  <Stethoscope className="h-8 w-8 text-primary" />
-                }
-              </div>
-              <div>
-                <CardTitle className="font-headline text-xl">{clinic.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">{clinic.type}</p>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-grow space-y-2">
-              <div className="flex items-start gap-2 text-muted-foreground">
-                <MapPin className="h-5 w-5 mt-1 shrink-0" />
-                <p>{clinic.address}</p>
-              </div>
-               {clinic.distance && (
-                <div className="flex items-center gap-2 text-sm text-primary font-medium pt-2">
-                  <Route className="h-4 w-4" />
-                  <p>{clinic.distance.toFixed(2)} km away</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 space-y-6 max-h-[600px] overflow-y-auto">
+         {clinics.length === 0 && !isLoading && !error && (
+            <div className="text-center text-muted-foreground pt-10">
+              <p>Click the button to find clinics near your location.</p>
+            </div>
+          )}
+          {clinics.map((clinic) => (
+            <Card key={clinic.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader className="flex-row items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-full">
+                  {clinic.type === 'Hospital' ? 
+                    <Hospital className="h-8 w-8 text-primary" /> : 
+                    <Stethoscope className="h-8 w-8 text-primary" />
+                  }
                 </div>
-              )}
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                <a 
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.address)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Get Directions
-                </a>
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+                <div>
+                  <CardTitle className="font-headline text-xl">{clinic.name}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{clinic.type}</p>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow space-y-2">
+                <div className="flex items-start gap-2 text-muted-foreground">
+                  <MapPin className="h-5 w-5 mt-1 shrink-0" />
+                  <p>{clinic.address}</p>
+                </div>
+                {clinic.distance && (
+                  <div className="flex items-center gap-2 text-sm text-primary font-medium pt-2">
+                    <Route className="h-4 w-4" />
+                    <p>{clinic.distance.toFixed(2)} km away</p>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter>
+                <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.name)}&query_place_id=${clinic.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Get Directions
+                  </a>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+        <div className="lg:col-span-2">
+            {mapUrl ? (
+                 <iframe
+                    className="w-full h-[600px] rounded-lg shadow-2xl border-0"
+                    loading="lazy"
+                    allowFullScreen
+                    src={mapUrl}>
+                </iframe>
+            ) : (
+                <div className="w-full h-[600px] rounded-lg bg-muted flex items-center justify-center">
+                    <p className="text-muted-foreground">The map will be displayed here.</p>
+                </div>
+            )}
+        </div>
       </div>
     </div>
   );
