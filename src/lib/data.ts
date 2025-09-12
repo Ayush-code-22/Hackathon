@@ -57,23 +57,30 @@ export const nearbyClinics: Clinic[] = [
 export const healthAlerts: HealthAlert[] = [
     {
         id: 1,
-        title: "High Flu Activity Reported",
-        message: "Increased flu cases have been reported in the Metropolis area. Please take precautions, such as frequent hand washing and considering a flu shot.",
-        date: "2024-07-28T10:00:00Z",
-        type: "High Priority"
-    },
-    {
-        id: 2,
-        title: "Vaccination Drive for Children",
-        message: "A special vaccination drive for measles and rubella is scheduled for August 5th at the Wellness Community Clinic.",
-        date: "2024-07-27T14:30:00Z",
+        title: "Seasonal Flu Vaccination Campaign",
+        message: "The annual flu vaccination drive has begun. All citizens, especially the elderly and children, are encouraged to get vaccinated at their nearest public health center.",
+        date: "2024-09-15T10:00:00Z",
         type: "Informational"
     },
     {
-        id: 3,
-        title: "Heatwave Advisory",
-        message: "A heatwave is expected over the next 48 hours. Stay hydrated, avoid direct sun exposure between 11 AM and 4 PM, and check on elderly neighbors.",
-        date: "2024-07-26T09:00:00Z",
+        id: 2,
+        title: "Dengue Outbreak Warning in Coastal Areas",
+        message: "A recent surge in Dengue cases has been reported in coastal districts. Residents are advised to eliminate mosquito breeding sites and use repellents. Seek medical help if you experience fever, headache, or joint pain.",
+        date: "2024-09-12T11:30:00Z",
         type: "High Priority"
+    },
+    {
+        id: 3,
+        title: "Advisory on Contaminated Water Supply",
+        message: "Water supply in the North Anytown district may be contaminated. Residents are advised to boil all drinking water or use certified water purifiers until further notice.",
+        date: "2024-09-10T17:00:00Z",
+        type: "High Priority"
+    },
+    {
+        id: 4,
+        title: "Free Health Check-up Camp",
+        message: "A free health screening camp for diabetes and hypertension will be held at Anytown Community Hall on September 20th from 9 AM to 4 PM.",
+        date: "2024-09-08T09:00:00Z",
+        type: "Informational"
     }
 ];
