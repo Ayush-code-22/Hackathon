@@ -5,14 +5,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Hospital, AlertTriangle } from "lucide-react";
 
 type HealthCenterData = {
-  statename: string;
-  chcsfunctional: string;
-  phcsfunctional: string;
+  state_uts: string;
+  no_of_chcs_functional_against_norm: string;
+  no_of_phcs_functional_against_norm: string;
 };
 
 async function getHealthCenterData(): Promise<HealthCenterData[]> {
   const apiKey = "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b";
-  const url = "https://api.data.gov.in/resource/61828a26-ed52-4522-a634-8c8876c12c90?api-key=" + apiKey + "&format=json&limit=50";
+  const url = "https://api.data.gov.in/resource/b51adc87-c097-464e-8758-e81560b8e03c?api-key=" + apiKey + "&format=json&limit=50";
 
   try {
     const response = await fetch(url, {
@@ -35,7 +35,12 @@ async function getHealthCenterData(): Promise<HealthCenterData[]> {
 export default async function HealthCentersPage() {
   const healthCenterData = await getHealthCenterData();
 
-  const sortedData = healthCenterData.sort((a, b) => a.statename.localeCompare(b.statename));
+  const sortedData = healthCenterData.sort((a, b) => a.state_uts.localeCompare(b.state_uts));
+
+  const formatCenterData = (data: string) => {
+    if (!data || !data.includes('/')) return data || 'N/A';
+    return data.split('/')[0];
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -64,10 +69,10 @@ export default async function HealthCentersPage() {
                 </TableHeader>
                 <TableBody>
                     {sortedData.map((record) => (
-                    <TableRow key={record.statename}>
-                        <TableCell className="font-medium">{record.statename}</TableCell>
-                        <TableCell className="text-right">{record.phcsfunctional || 'N/A'}</TableCell>
-                        <TableCell className="text-right">{record.chcsfunctional || 'N/A'}</TableCell>
+                    <TableRow key={record.state_uts}>
+                        <TableCell className="font-medium">{record.state_uts}</TableCell>
+                        <TableCell className="text-right">{formatCenterData(record.no_of_phcs_functional_against_norm)}</TableCell>
+                        <TableCell className="text-right">{formatCenterData(record.no_of_chcs_functional_against_norm)}</TableCell>
                     </TableRow>
                     ))}
                 </TableBody>
