@@ -29,7 +29,7 @@ const dashboardCards = [
     title: "Usage Analytics",
     icon: <BarChart2 className="h-8 w-8 text-primary" />,
     description: "See your interaction history and usage statistics.",
-    href: "/dashboard",
+    href: "/analytics",
     cta: "View Stats"
   }
 ]

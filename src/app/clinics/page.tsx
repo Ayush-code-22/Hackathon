@@ -15,14 +15,12 @@ export default function ClinicsPage() {
     setLocating(true);
     toast({
       title: "Locating...",
-      description: "Please allow location access in your browser.",
+      description: "This is a demo. In a real app, we would ask for your location to find nearby clinics.",
     });
 
     // Simulate geolocation API call
     setTimeout(() => {
       setLocating(false);
-      // In a real app, you would use navigator.geolocation.getCurrentPosition
-      // and then filter clinics based on the user's coordinates.
       toast({
         title: "Clinics updated!",
         description: "Showing clinics in your area.",
