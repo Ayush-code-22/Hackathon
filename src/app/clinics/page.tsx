@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import dynamic from 'next/dynamic';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,29 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { findNearbyClinics } from "@/lib/actions";
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-// Fix for default icon issue with Leaflet and React
-const userIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-  className: 'user-location-marker'
-});
-
-const clinicIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
 
 
 export default function ClinicsPage() {
@@ -47,7 +24,7 @@ export default function ClinicsPage() {
   const [mapZoom, setMapZoom] = useState(4);
 
   const Map = useMemo(() => dynamic(() => import('@/components/map'), { 
-    loading: () => <p className="text-muted-foreground">Loading Map...</p>,
+    loading: () => <div className="h-full w-full flex items-center justify-center bg-muted"><p className="text-muted-foreground">Loading Map...</p></div>,
     ssr: false 
   }), []);
 
@@ -198,17 +175,10 @@ export default function ClinicsPage() {
                   mapZoom={mapZoom}
                   userLocation={userLocation}
                   clinics={clinics}
-                  userIcon={userIcon}
-                  clinicIcon={clinicIcon}
                 />
            </div>
         </div>
       </div>
-      <style jsx global>{`
-        .user-location-marker {
-          filter: hue-rotate(120deg);
-        }
-      `}</style>
     </div>
   );
 }
