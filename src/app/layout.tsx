@@ -5,7 +5,7 @@ import Header from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'MediMate - Your AI Health Assistant',
+  title: 'MedLax - Your AI Health Assistant',
   description: 'An AI-driven public health chatbot for symptom checking and health information.',
   icons: {
     icon: '/favicon.ico',

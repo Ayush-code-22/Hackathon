@@ -28,7 +28,7 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-headline font-bold text-primary">About MediMate</h1>
+        <h1 className="text-4xl font-headline font-bold text-primary">About MedLax</h1>
         <p className="mt-2 text-lg text-muted-foreground">
           Your trusted AI health assistant for reliable information and support.
         </p>
@@ -36,7 +36,7 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold text-center mb-8">Our Mission</h2>
         <p className="text-center text-muted-foreground mb-12">
-          MediMate is dedicated to making healthcare information accessible and understandable for everyone. We leverage cutting-edge AI to provide a reliable resource for public health awareness, symptom checking, and finding local medical services. Our goal is to empower users to make informed decisions about their health and well-being.
+          MedLax is dedicated to making healthcare information accessible and understandable for everyone. We leverage cutting-edge AI to provide a reliable resource for public health awareness, symptom checking, and finding local medical services. Our goal is to empower users to make informed decisions about their health and well-being.
         </p>
         <h2 className="text-2xl font-bold text-center mb-8">Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

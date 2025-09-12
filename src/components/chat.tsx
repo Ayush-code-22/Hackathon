@@ -136,7 +136,7 @@ export default function Chat() {
           <div className="p-6 space-y-6">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground p-8">
-                <p>Welcome to MediMate!</p>
+                <p>Welcome to MedLax!</p>
                 <p className="text-sm">Describe your symptoms to get started.</p>
               </div>
             )}

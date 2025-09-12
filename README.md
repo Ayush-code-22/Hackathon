@@ -1,4 +1,4 @@
-# MediMate
+# MedLax
 
 This is an AI-driven public health chatbot application.
 

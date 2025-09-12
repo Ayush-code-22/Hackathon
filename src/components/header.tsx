@@ -40,7 +40,7 @@ export default function Header() {
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2 font-headline text-lg font-semibold">
           <HeartPulse className="h-6 w-6 text-primary" />
-          <span>MediMate</span>
+          <span>MedLax</span>
         </Link>
         
         {/* Desktop Navigation */}
@@ -79,7 +79,7 @@ export default function Header() {
           <SheetContent side="left">
              <Link href="/" className="flex items-center gap-2 font-headline text-lg font-semibold mb-8">
               <HeartPulse className="h-6 w-6 text-primary" />
-              <span>MediMate</span>
+              <span>MedLax</span>
             </Link>
             <nav className="grid gap-4 text-base font-medium">
               {navLinks.map((link) => (
