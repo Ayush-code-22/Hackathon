@@ -1,5 +1,5 @@
-# Firebase Studio
+# MediMate
 
-This is a NextJS starter in Firebase Studio.
+This is an AI-driven public health chatbot application.
 
 To get started, take a look at src/app/page.tsx.
