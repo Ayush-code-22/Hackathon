@@ -10,22 +10,22 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
-  const [mobile, setMobile] = useState("");
-  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (mobile.trim() === "" || otp.trim() === "") {
+    if (email.trim() === "" || password.trim() === "") {
       toast({
         variant: "destructive",
         title: "Missing Information",
-        description: "Please enter both mobile number and OTP.",
+        description: "Please enter both email and password.",
       });
       return;
     }
-    // In a real application, you would verify the OTP here.
+    // In a real application, you would verify the email and password here.
     // For this prototype, we'll just redirect to the dashboard.
     router.push("/dashboard");
   };
@@ -36,39 +36,35 @@ export default function LoginPage() {
         <form onSubmit={handleLogin}>
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-headline font-bold text-primary">Login or Sign Up</CardTitle>
-            <CardDescription>Enter your mobile number to receive a one-time password (OTP).</CardDescription>
+            <CardDescription>Enter your email and password to access your account.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number</Label>
-              <div className="flex items-center gap-2">
-                <span className="rounded-md border border-input bg-background px-3 py-2 text-muted-foreground">+91</span>
-                <Input 
-                  id="mobile" 
-                  type="tel" 
-                  placeholder="98765 43210" 
-                  required 
-                  className="flex-1" 
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
-                />
-              </div>
+              <Label htmlFor="email">Email Address</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@example.com" 
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="otp">One-Time Password (OTP)</Label>
+              <Label htmlFor="password">Password</Label>
               <Input 
-                id="otp" 
-                type="text" 
-                placeholder="Enter your 6-digit OTP" 
+                id="password" 
+                type="password" 
+                placeholder="Enter your password" 
                 required 
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              Verify OTP & Login
+              Login
             </Button>
             <p className="text-xs text-muted-foreground text-center">
               By continuing, you agree to our{" "}
