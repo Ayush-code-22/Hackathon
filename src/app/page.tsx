@@ -38,13 +38,12 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center text-white">
         <Image
-          src="https://picsum.photos/seed/clinic/1200/800"
+          src="/hero-background.jpg"
           alt="A modern, bright hospital interior"
           fill
           style={{ objectFit: 'cover' }}
           className="absolute inset-0 z-0"
           priority
-          data-ai-hint="hospital interior"
         />
         <div className="absolute inset-0 bg-black/50 z-10" />
         <div className="relative z-20 container mx-auto px-4 text-center">
