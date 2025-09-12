@@ -1,6 +1,7 @@
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Bell, MapPin, BarChart2 } from "lucide-react";
+import { MessageSquare, Bell, MapPin, BarChart2, Hospital } from "lucide-react";
 import Link from "next/link";
 
 const dashboardCards = [
@@ -26,6 +27,13 @@ const dashboardCards = [
     cta: "Find Clinics"
   },
   {
+    title: "Health Centers Data",
+    icon: <Hospital className="h-8 w-8 text-primary" />,
+    description: "View data on health centers across different states.",
+    href: "/health-centers",
+    cta: "View Data"
+  },
+  {
     title: "Usage Analytics",
     icon: <BarChart2 className="h-8 w-8 text-primary" />,
     description: "See your interaction history and usage statistics.",
@@ -43,7 +51,7 @@ export default function DashboardPage() {
           Your personal health hub.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {dashboardCards.map(card => (
           <Card key={card.title} className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
             <CardHeader className="flex flex-row items-center gap-4">
